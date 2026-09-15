@@ -46,7 +46,7 @@ char*** groupAnagrams(char** strs, int len, int* rsz, int** rcz) {
 
     if (!nodes[k].offset) {
 empty:
-      printf("New bucket [%d]: placed at bucket offset 0: %s\n", *rsz, strs[i]);
+      printf("New bucket ['%s'][iv:%d] -> [key:%d]\n", strs[i], iv, *rsz);
       strcpy(values[*rsz][0], strs[i]);
       nodes[k].iv = iv;
       nodes[k].offset += lengths[i];
@@ -58,7 +58,7 @@ empty:
     
     if (nodes[k].iv == iv) {
 iv_match:
-      printf("Adding '%s' to bucket %d\n", strs[i],k);
+      printf("Appending [%s][iv: %d (%d) ] -> [key:%d]\n", strs[i],nodes[k].iv, iv, k);
       char** p = &values[nodes[k].row][(*rcz)[k]];
       *p += nodes[k].offset;  
       strcpy(*p, strs[i]);
@@ -66,19 +66,17 @@ iv_match:
       (*rcz)[k]++;
       continue;
     }
-
-    printf("Key %d for '%s' occupied. Trying", k, strs[i]);
-    for(k = (k + 1) % len; k < len ;k = (k + 1) % len) {
-      printf(" %d ...", k);
-      if (nodes[k].iv == iv) {
-        printf("matched!\n");
-        goto iv_match;
-      }
-      if (!nodes[k].offset)  {
-        printf("empty! placing new bucket\n");
-        goto empty;
-      }
-    }
+    
+    // for(k = (k + 1) % len; k < len ;k = (k + 1) % len) {
+    //   if (nodes[k].iv == iv) {
+    //     printf("[iv match]: ");
+    //     goto iv_match;
+    //   }
+    //   if (!nodes[k].offset)  {
+    //     printf("[probde key]: ");
+    //     goto empty;
+    //   }
+    // }
     
     
   }
@@ -93,8 +91,14 @@ int main() {
   int r = 0;
   char* x[] = {"eat","tea","tan","ate","nat","bat"};
   int len = sizeof(x) / sizeof(x[0]);
-  int* csz = NULL; 
-  
+  int* csz = NULL;
+
+  // int v = 0;
+  // for(char* s = x[4]; *s != '\0'; s++) v+=*s;
+  // printf("%d", h(v, len) % len);
+  // exit(0); 
+
+  printf("calling with %d strings", len);
   char*** answer = groupAnagrams(x, len, &r, &csz);
   for(int i = 0; i < len; i++) {
     if (answer[i] == NULL) continue;
