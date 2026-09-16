@@ -8,6 +8,7 @@ struct Node {
   int iv;
   unsigned int offset;
   unsigned int row;
+  char* start; 
 };
 
 int h(int x, int sz) {
@@ -29,13 +30,13 @@ char*** groupAnagrams(char** strs, int len, int* rsz, int** rcz) {
 
   int total_sz = 0;
   for(int i = 0; i < len; i++) {
-    lengths[i] = sizeof(strs[i]);
+    lengths[i] = strlen(strs[i]) + 1;
     total_sz += lengths[i];
   }
   for(int i = 0; i < len; i++) {
     values[i] = malloc(len * sizeof(char*));
     char* p = malloc(total_sz);
-    for(int j = 0; j < len; j++) values[i][j] = p;
+    memset(values[i], 0, len * sizeof(char*));
     memset(p, 0, total_sz);
   }
 
@@ -46,7 +47,7 @@ char*** groupAnagrams(char** strs, int len, int* rsz, int** rcz) {
 
     if (!nodes[k].offset) {
 empty:
-      printf("New bucket ['%s'][iv:%d] -> [key:%d]\n", strs[i], iv, *rsz);
+      printf("New bucket [%s][iv:%d] -> [key:%d]\n", strs[i], iv, k);
       strcpy(values[*rsz][0], strs[i]);
       nodes[k].iv = iv;
       nodes[k].offset += lengths[i];
@@ -98,21 +99,17 @@ int main() {
   // printf("%d", h(v, len) % len);
   // exit(0); 
 
-  printf("calling with %d strings", len);
+  printf("calling with %d strings\n", len);
   char*** answer = groupAnagrams(x, len, &r, &csz);
   for(int i = 0; i < len; i++) {
-    if (answer[i] == NULL) continue;
+    if (*answer[i][0] == '\0') continue;
     printf("[");
-    for(int j = 0; j < csz[i]; j++) {
-      if (answer[i][j] == NULL) {
-        free(answer[i][0]);
-        break; 
-      }
-      printf("%s,", answer[i][j]); 
+    for(int j = 0; j < len; j++) {
+      if (*answer[i][j] == '\0') break;
+      printf("%s, ", answer[i][j]);
     }
     printf("]\n");
-    free(answer[i]);
   }
-  free(answer);
+  
   return 0;
 }
